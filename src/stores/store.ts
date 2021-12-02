@@ -1,16 +1,13 @@
-import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from './slices/counter';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
+import rootReducer from "./reducers";
 
-const rootStore = {
-  counter: counterReducer
-};
-
-const store = configureStore({
-  reducer: rootStore
-});
+const store = createStore(
+  rootReducer,
+  compose(
+    applyMiddleware(thunk),
+    (window as any).devToolsExtension ? (window as any).devToolsExtension() : (f: any) => f
+  )
+);
 
 export default store;
-
-export type RootState = ReturnType<typeof store.getState>;
-
-export type AppDispatch = typeof store.dispatch;

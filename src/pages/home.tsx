@@ -1,19 +1,16 @@
 import React, { useEffect } from 'react';
 import { Row, Col } from 'antd';
-// import { getCurrent, WebviewWindow } from '@tauri-apps/api/window';
-// import { Event } from '@tauri-apps/api/event';
-// import { invoke, event } from '@tauri-apps/api';
+import { useDispatch } from "react-redux";
 
 import { RouteConfig } from '../types';
+import { useTypedSelector } from '../stores/reducers/index';
+import { addNumber, minusNumber, addNumberAsync } from '../stores/actions/count';
 import RouteWithSubRoutes from '../router/RouteWithSubRoutes';
 
 import logo from '../logo.svg';
 import tauriCircles from '../tauri.svg';
 import tauriWord from '../wordmark.svg';
 import { history } from '../App';
-
-import { useAppSelector, useAppDispatch } from '../stores/hooks';
-import { decrement, increment } from '../stores/slices/counter';
 
 type AppProps = {
   routes: RouteConfig[]
@@ -22,23 +19,12 @@ type AppProps = {
 export default function Home(props: AppProps) {
 
   const { routes } = props;
-
-  const count = useAppSelector(state => state.counter.value)
-  const dispatch = useAppDispatch()
+  const dispatch = useDispatch();
+  const count = useTypedSelector(state => state.count);
 
   useEffect(() => {
     console.log('Home: useEffect');
   }, []);
-
-  // useEffect(() => {
-  //   // emit an event that are only visible to the current window
-  //   const current = getCurrent();
-  //   current.listen('communication', (event: Event<unknown>) => {
-  //     console.log(event.payload);
-  //   });
-  //   current.emit('communication', 'Tauri is awesome!(frontend)');
-
-  // }, [])
 
   return (
     <Row className="App">
@@ -48,7 +34,7 @@ export default function Home(props: AppProps) {
             <button
               aria-label="Increment value"
               className="App-link"
-              onClick={() => dispatch(increment())}
+              onClick={() => dispatch(addNumberAsync(2))}
             >
               Increment
             </button>
@@ -56,7 +42,7 @@ export default function Home(props: AppProps) {
             <button
               aria-label="Decrement value"
               className="App-link"
-              onClick={() => dispatch(decrement())}
+              onClick={() => dispatch(minusNumber())}
             >
               Decrement
             </button>

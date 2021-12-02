@@ -5,6 +5,11 @@ export interface RouteConfig {
   routes?: RouteConfig[];
 };
 
+export interface ReduxAction {
+  type: string,
+  value: any
+}
+
 export type Callback<P, T> = (payload: P) => T;
 
 export interface State {
@@ -117,6 +122,7 @@ export interface Status {
 }
 
 export interface RootState {
+  count: number,
   config: Config[];
   status: Status;
   settings: Settings;
