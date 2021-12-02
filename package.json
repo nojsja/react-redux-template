@@ -11,13 +11,10 @@
     "name": "NoJsJa",
     "email": "yangwei020154@gmail.com"
   },
-  "comments": "before start dist resources, confirm you have dll static library!",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve",
-    "rimraf": "rimraf ./dist -rf",
-    "dll": "webpack --config webpack.dll.config.js",
-    "dist": "webpack --config webpack.prod.config.js",
-    "build": "npm run rimraf; npm run dll; npm run dist;"
+    "prebuild": "rimraf -rf ./dist",
+    "build": "webpack --config webpack.prod.config.js --progress"
   },
   "keywords": [
     "typescript",
@@ -90,6 +87,7 @@
     "style-loader": "^0.21.0",
     "url-loader": "^4.1.1",
     "webpack": "^5.64.4",
+    "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.1"
   }
 }

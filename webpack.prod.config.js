@@ -5,13 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const os = require('os');
 const HappyPack = require('happypack');
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
-const manifest = require('./vendor-manifest.json')
-
-// 拆分静态库
-const dllRefPlugin = new webpack.DllReferencePlugin({
-  context: __dirname,
-  manifest: require(path.resolve('./vendor-manifest.json')),
-});
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = {
   entry: [
@@ -72,7 +66,6 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              // you can specify a publicPath here
               // by default it uses publicPath in webpackOptions.output
               publicPath: path.join(__dirname, 'dist/'),
             },
@@ -121,12 +114,12 @@ module.exports = {
   },
 
   plugins: [
+    new BundleAnalyzerPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify('production'),
       },
     }),
-    dllRefPlugin,
     new HappyPack({
       id: 'babel',
       threadPool: happyThreadPool,
@@ -142,11 +135,33 @@ module.exports = {
       template: 'template.ejs',
       inject: 'body',
       publicPath: './',
-      vendor:  `dll_${manifest.name}.js`,
       minify: false
     }),
   ],
 
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minSize: 20000,
+      minRemainingSize: 0,
+      minChunks: 2,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 30,
+      enforceSizeThreshold: 50000,
+      cacheGroups: {
+        defaultVendors: {
+          name: 'vendors_[hash:8].[ext]',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+        default: {
+          name: 'bundle_[hash:8].[ext]',
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    }
   }
 };

@@ -116,6 +116,29 @@ module.exports = {
   ],
 
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minSize: 20000,
+      minRemainingSize: 0,
+      minChunks: 2,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 30,
+      enforceSizeThreshold: 50000,
+      cacheGroups: {
+        defaultVendors: {
+          name: 'vendors_[hash:8].[ext]',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+        default: {
+          name: 'bundle_[hash:8].[ext]',
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    }
   },
 
   devServer: {
