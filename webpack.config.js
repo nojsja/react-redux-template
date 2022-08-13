@@ -38,7 +38,7 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.m?js|\.jsx$/,
+        test: /(\.js?|\.jsx?)$/,
         exclude: /(node_modules|bower_components)/,
         use: ['happypack/loader?id=babel']
       },
