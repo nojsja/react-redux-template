@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 
 import { RouteConfig } from '../types';
 import { useTypedSelector } from '../stores/reducers/index';
-import { addNumber, minusNumber, addNumberAsync } from '../stores/actions/count';
+import { minusNumber, addNumberAsync } from '../stores/actions/count';
 import RouteWithSubRoutes from '../router/RouteWithSubRoutes';
 
 import logo from '../logo.svg';

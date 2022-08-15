@@ -1,15 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 const os = require('os');
-const HappyPack = require('happypack');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
+
+const cpuLength = os.cpus().length;
 
 module.exports = {
   devtool: 'cheap-module-source-map',
-  entry: [
-    './index.tsx',
-  ],
+  entry: path.resolve(__dirname, './index.tsx'),
   mode: 'development',
   output: {
     filename: 'bundle.js',
@@ -17,7 +16,6 @@ module.exports = {
     publicPath: '/',
   },
   resolve: {
-    modules: [path.resolve(__dirname, 'node_modules')],
     alias: {
       // dir
       resources: path.resolve(__dirname, 'resources'),
@@ -27,28 +25,28 @@ module.exports = {
       stores: path.resolve(__dirname, 'src/stores'),
       router: path.resolve(__dirname, 'src/router'),
     },
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx']
   },
   module: {
     noParse:[/jquery/],
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
         exclude: /node_modules/,
+        use: ['ts-loader']
       },
       {
         test: /(\.js?|\.jsx?)$/,
         exclude: /(node_modules|bower_components)/,
-        use: ['happypack/loader?id=babel']
+        use: ["babel-loader?cacheDirectory"]
       },
       {
         test: /\.css$/,
-        use: ['happypack/loader?id=css'],
+        use: ['style-loader', 'css-loader']
       },
       {
         test: /\.less$/,
-        use: ['happypack/loader?id=less'],
+        use: ['style-loader', 'css-loader', 'less-loader']
       },
       {
         test: /\.html$/,
@@ -90,20 +88,10 @@ module.exports = {
         NODE_ENV: JSON.stringify('development'),
       },
     }),
-    new HappyPack({
-      id: 'babel',
-      threadPool: happyThreadPool,
-      loaders: ["babel-loader?cacheDirectory"],
-    }),
-    new HappyPack({
-      id: 'css',
-      threadPool: happyThreadPool,
-      loaders: ['style-loader', 'css-loader'],
-    }),
-    new HappyPack({
-      id: 'less',
-      threadPool: happyThreadPool,
-      loaders: ['style-loader', 'css-loader', 'less-loader'],
+    new ESLintPlugin({
+      extensions: ['.ts', '.tsx'],
+      context: path.resolve(__dirname, './'),
+      threads: cpuLength > 4 ? 4 : cpuLength,
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),

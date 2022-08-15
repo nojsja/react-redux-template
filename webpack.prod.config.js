@@ -1,16 +1,15 @@
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const os = require('os');
-const HappyPack = require('happypack');
-const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const ESLintPlugin = require('eslint-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const cpuLength = os.cpus().length;
 
 module.exports = {
-  entry: [
-    './index.tsx',
-  ],
+  entry: path.resolve(__dirname, './index.tsx'),
   // devtool: 'hidden-source-map',
   mode: 'production',
   output: {
@@ -19,7 +18,6 @@ module.exports = {
     publicPath: '',
   },
   resolve: {
-    modules: [path.resolve(__dirname, 'node_modules')],
     alias: {
       // dir
       resources: path.resolve(__dirname, 'resources'),
@@ -29,20 +27,20 @@ module.exports = {
       stores: path.resolve(__dirname, 'src/stores'),
       router: path.resolve(__dirname, 'src/router'),
     },
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx']
   },
   module: {
     noParse:[/jquery/],
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
         exclude: /node_modules/,
+        use: ['ts-loader']
       },
       {
-        test: /\.m?js|\.jsx$/,
+        test: /(\.js?|\.jsx?)$/,
         exclude: /(node_modules|bower_components)/,
-        use: ['happypack/loader?id=babel']
+        use: ['babel-loader?cacheDirectory']
       },
       {
         test: /\.css$/,
@@ -120,10 +118,10 @@ module.exports = {
         NODE_ENV: JSON.stringify('production'),
       },
     }),
-    new HappyPack({
-      id: 'babel',
-      threadPool: happyThreadPool,
-      loaders: ['babel-loader?cacheDirectory'],
+    new ESLintPlugin({
+      extensions: ['.ts', '.tsx'],
+      context: path.resolve(__dirname, './'),
+      threads: cpuLength > 4 ? 4 : cpuLength,
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
